@@ -17,7 +17,7 @@
 
 
  contract greeter is mortal {
-     /* define variable greeting of the type string */
+     /* define variable greeting of the type string  */
      string greeting;
 
      /* this runs when the contract is executed */
