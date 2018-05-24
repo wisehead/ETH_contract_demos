@@ -1,0 +1,23 @@
+
+MOG：
+--1.safeMath
+--2.onlyPayloadSize//dev Fix for the ERC20 short address attack.
+--3.mint//是否支持挖矿？？？
+--4.airdrop
+--5.changowner
+--6.黑白名单
+
+
+//1.WTC 最基本功能。
+2.ACE 可以铸币，可以转移owner。teamTokensHolder，communityTokensHolder
+//3.300Token，基本功能，SetupToken负责初始化币种名称、总量信息等。
+4.AION，owner，可以暂停，可以回滚转款误操作。Finalizable，实现token和leger的功能。burning功能，也有增发功能。decreaseApproval似乎有点用。claimByProof
+//5.ATLANT，onlyPayloadSize//溢出攻击？？？也有mint函数
+//6.ATMChain,setDisabled//在数据迁移时,需要先停止ATM交易
+7.AVT,DSAuthority跟权限有关，但是DSAuthority canCall函数没有实现怎么理解，authority == DSAuthority(0)怎么理解。
+8.Accelerator(ACC)：airdrop功能。accelerator啥意思，支持POS？？？支持一套基于POS的挖矿算法。
+9.AdBank：有safeMath，有Stage的概念，有change owner的概念。
+10.AdEx：LimitedTransferToken什么概念？？VestedToken没看懂
+11.Adshares(ADST)：
+
+
