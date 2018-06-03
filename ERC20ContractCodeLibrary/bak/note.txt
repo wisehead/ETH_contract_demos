@@ -21,3 +21,30 @@ MOG：
 11.Adshares(ADST)：
 
 
+MOG众筹合约
+1.参考标准crowdSale合约，修改截止日期和withdraw函数：（https://ethereum.org/crowdsale）
+2.预售合同。带有增发功能，但是没有withdraw接口：（https://github.com/bitclave/crowdsale/blob/master/contracts/CATCrowdsale.sol）
+3.
+
+
+
+1.化学
+-送检
+-营养方面。
+-
+
+
+
+2.物理：
+暂时没有办法集合。
+物理
+
+物理：
+--摄像头，无良网卡，未经定位仪，水检测，土壤检测模块。追踪仪器。（一到三个月）
+--现在欠缺数据存储平台。
+
+
+
+3.
+
+
