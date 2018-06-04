@@ -27,6 +27,7 @@ contract Owned {
     }
 
     function changeOwner(address _newOwner) onlyOwner {
+        require(_newOwner != address(0));
         newOwner = _newOwner;
     }
 
