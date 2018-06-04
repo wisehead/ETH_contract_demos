@@ -13,7 +13,31 @@ contract Token {
     event Approval(address indexed owner, address indexed spender, uint256 value);
 }
 
-contract StandardToken is Token {
+contract Owned {
+    address public owner;
+    address newOwner;
+
+    function Owned() {
+        owner = msg.sender;
+    }
+
+    modifier onlyOwner() {
+        require(msg.sender == owner);
+        _;
+    }
+
+    function changeOwner(address _newOwner) onlyOwner {
+        newOwner = _newOwner;
+    }
+
+    function acceptOwnership() {
+        if (msg.sender == newOwner) {
+            owner = newOwner;
+        }
+    }
+}
+
+contract StandardToken is Owned, Token {
 
     mapping (address => uint256) balances;
     mapping (address => mapping (address => uint256)) allowed;
