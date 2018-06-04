@@ -60,6 +60,7 @@ contract StandardToken is Owned, Token {
         returns (bool)
     {
         require(balances[_from] >= _value && allowed[_from][msg.sender] >= _value);
+        require(_to != address(0));
         balances[_to] += _value;
         balances[_from] -= _value;
         allowed[_from][msg.sender] -= _value;
@@ -93,7 +94,7 @@ contract StandardToken is Owned, Token {
     }
 
     event Burn(address indexed _burner, uint _value);
-    
+
     function burn(uint256 wad) onlyOwner returns (bool) {
         require (balances[msg.sender] >= wad);
         require (totalSupply >= wad);
@@ -103,6 +104,14 @@ contract StandardToken is Owned, Token {
         Transfer(msg.sender, address(0x0), _value);
         return true;
     }
+
+    // save some gas by making only one contract call
+    function burnFrom(address _from, uint256 _value) onlyOwner returns (bool) 
+    {
+        assert( transferFrom( _from, msg.sender, _value ) );
+        return burn(_value);
+    }
+
 }
 
 contract XiaoshiToken is StandardToken {
