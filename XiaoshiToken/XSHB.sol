@@ -114,13 +114,13 @@ contract StandardToken is Owned, Token {
 
 }
 
-contract XiaoshiToken is StandardToken {
+contract XiaoshiTokenB is StandardToken {
 
-    string constant public name = "Xiaoshi Token";
-    string constant public symbol = "XSH";
+    string constant public name = "XiaoshiB Token";
+    string constant public symbol = "XSHB";
     uint8 constant public decimals = 18;
 
-    function XiaoshiToken()
+    function XiaoshiTokenB()
         public
     {
         totalSupply = 200 * 1000000 * 10**18; // will not change

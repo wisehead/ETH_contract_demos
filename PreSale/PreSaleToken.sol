@@ -77,6 +77,8 @@ contract Presale {
      */
     function safeWithdrawal() afterDeadline {
         if (!fundingGoalReached) {
+            uint remainingCoins = (fundingGoal - amountRaised) * price;
+            
             uint amount = balanceOf[msg.sender];
             balanceOf[msg.sender] = 0;
             if (amount > 0) {
