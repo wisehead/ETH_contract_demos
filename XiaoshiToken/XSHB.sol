@@ -91,6 +91,18 @@ contract StandardToken is Owned, Token {
     {
         return balances[_owner];
     }
+
+    event Burn(address indexed _burner, uint _value);
+    
+    function burn(uint256 wad) onlyOwner returns (bool) {
+        require (balances[msg.sender] >= wad);
+        require (totalSupply >= wad);
+        balances[msg.sender] = balances[msg.sender] - wad;
+        totalSupply = totalSupply - wad;
+        Burn(msg.sender, _value);
+        Transfer(msg.sender, address(0x0), _value);
+        return true;
+    }
 }
 
 contract XiaoshiToken is StandardToken {
