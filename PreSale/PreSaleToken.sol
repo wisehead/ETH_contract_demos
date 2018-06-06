@@ -2,22 +2,25 @@
 pragma solidity ^0.4.16;
 
 interface token {
-    function transfer(address receiver, uint amount);
+    function transfer(address receiver, uint256 amount);
 }
 
 contract Presale {
     address public beneficiary;
-    uint public fundingGoal;
-    uint public amountRaised;
-    uint public deadline;
-    uint public price;
+    uint256 public amountRaised;
+    uint256 public deadline;
+    uint256 public price;
+    uint256 public hardCap;
+    uint256 public softCap;
     token public tokenReward;
     mapping(address => uint256) public balanceOf;
-    bool fundingGoalReached = false;
+    bool softCapReached = false;
+    bool hardCapReached = false;
     bool presaleClosed = false;
 
-    event GoalReached(address recipient, uint totalAmountRaised);
-    event FundTransfer(address backer, uint amount, bool isContribution);
+    event GoalReached(address recipient, uint256 totalAmountRaised);
+    event SoftCapReached(uint256 softCap);
+    event FundTransfer(address backer, uint256 amount, bool isContribution);
 
     /**
      * Constructor function
@@ -26,15 +29,14 @@ contract Presale {
      */
     function Presale(
         address ifSuccessfulSendTo,
-        uint fundingGoalInEthers,
         uint durationInMinutes,
-        uint etherCostOfEachToken,
         address addressOfTokenUsedAsReward
     ) {
         beneficiary = ifSuccessfulSendTo;
-        fundingGoal = fundingGoalInEthers * 1 ether;
+        hardCap = 4000 * 1 ether;
+        softCap = 400 * 1 ether;
         deadline = now + durationInMinutes * 1 minutes;
-        price = etherCostOfEachToken * 1 ether;
+        price = 4000;
         tokenReward = token(addressOfTokenUsedAsReward);
     }
 
@@ -45,7 +47,15 @@ contract Presale {
      */
     function () payable {
         require(!presaleClosed);
-        uint amount = msg.value;
+        require(msg.value >= 0.01 * 1 ether);
+        require(amountRaised + msg.value <= hardCap);
+
+        if (!softCapReached && amountRaised < softCap && amountRaised + msg.value >= softCap) {
+            softCapReached = true;
+            SoftCapReached(softCap);
+        }
+
+        uint256 amount = msg.value;
         balanceOf[msg.sender] += amount;
         amountRaised += amount;
         tokenReward.transfer(msg.sender, amount / price);
@@ -76,10 +86,10 @@ contract Presale {
      * the amount they contributed.
      */
     function safeWithdrawal() afterDeadline {
-        if (!fundingGoalReached) {
-            uint remainingCoins = (fundingGoal - amountRaised) * price;
+        if (!softCapReached) {
+            uint256 remainingCoins = (fundingGoal - amountRaised) * price;
             
-            uint amount = balanceOf[msg.sender];
+            uint256 amount = balanceOf[msg.sender];
             balanceOf[msg.sender] = 0;
             if (amount > 0) {
                 if (msg.sender.send(amount)) {
@@ -90,7 +100,7 @@ contract Presale {
             }
         }
 
-        if (fundingGoalReached && beneficiary == msg.sender) {
+        if (softCapReached && beneficiary == msg.sender) {
             if (beneficiary.send(amountRaised)) {
                 FundTransfer(beneficiary, amountRaised, false);
             } else {
