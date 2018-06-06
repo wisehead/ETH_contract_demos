@@ -15,7 +15,7 @@ contract Presale {
     token public tokenReward;
     mapping(address => uint256) public balanceOf;
     bool softCapReached = false;
-    bool hardCapReached = false;
+    bool fundingGoalReached = false;
     bool presaleClosed = false;
 
     event GoalReached(address recipient, uint256 totalAmountRaised);
@@ -36,7 +36,7 @@ contract Presale {
         hardCap = 4000 * 1 ether;
         softCap = 400 * 1 ether;
         deadline = now + durationInMinutes * 1 minutes;
-        price = 4000;
+        price = 4000;//each ETH = 4000 XSH
         tokenReward = token(addressOfTokenUsedAsReward);
     }
 
@@ -58,8 +58,8 @@ contract Presale {
         uint256 amount = msg.value;
         balanceOf[msg.sender] += amount;
         amountRaised += amount;
-        tokenReward.transfer(msg.sender, amount / price);
-        FundTransfer(msg.sender, amount, true);
+        tokenReward.transfer(msg.sender, amount * price);
+        FundTransfer(msg.sender, amount * price, true);
     }
 
     modifier afterDeadline() { if (now >= deadline) _; }
@@ -70,7 +70,7 @@ contract Presale {
      * Checks if the goal or time limit has been reached and ends the campaign
      */
     function checkGoalReached() afterDeadline {
-        if (amountRaised >= fundingGoal){
+        if (amountRaised >= hardCap){
             fundingGoalReached = true;
             GoalReached(beneficiary, amountRaised);
         }
@@ -87,7 +87,7 @@ contract Presale {
      */
     function safeWithdrawal() afterDeadline {
         if (!softCapReached) {
-            uint256 remainingCoins = (fundingGoal - amountRaised) * price;
+            uint256 remainingCoins = (hardCap - amountRaised) * price;
             
             uint256 amount = balanceOf[msg.sender];
             balanceOf[msg.sender] = 0;
