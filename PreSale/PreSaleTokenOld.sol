@@ -28,13 +28,12 @@ contract Presale {
         address ifSuccessfulSendTo,
         uint fundingGoalInEthers,
         uint durationInMinutes,
-        uint etherCostOfEachToken,
         address addressOfTokenUsedAsReward
     ) {
         beneficiary = ifSuccessfulSendTo;
         fundingGoal = fundingGoalInEthers * 1 ether;
         deadline = now + durationInMinutes * 1 minutes;
-        price = etherCostOfEachToken * 1 ether;
+        price = 10;
         tokenReward = token(addressOfTokenUsedAsReward);
     }
 
@@ -48,7 +47,7 @@ contract Presale {
         uint amount = msg.value;
         balanceOf[msg.sender] += amount;
         amountRaised += amount;
-        tokenReward.transfer(msg.sender, amount);
+        tokenReward.transfer(msg.sender, amount * price);
         FundTransfer(msg.sender, amount, true);
     }
 
@@ -76,7 +75,7 @@ contract Presale {
      * the amount they contributed.
      */
     function safeWithdrawal() afterDeadline {
-        if (!fundingGoalReached) {
+        if (!fundingGoalReached && beneficiary != msg.sender) {
             uint remainingCoins = (fundingGoal - amountRaised) * price;
             
             uint amount = balanceOf[msg.sender];
@@ -90,7 +89,8 @@ contract Presale {
             }
         }
 
-        if (fundingGoalReached && beneficiary == msg.sender) {
+        //if (fundingGoalReached && beneficiary == msg.sender) {
+        if (beneficiary == msg.sender) {
             if (beneficiary.send(amountRaised)) {
                 FundTransfer(beneficiary, amountRaised, false);
             } else {
@@ -100,4 +100,3 @@ contract Presale {
         }
     }
 }
-
