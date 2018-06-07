@@ -8,15 +8,18 @@ interface token {
 contract Presale {
     address public beneficiary;
     uint public fundingGoal;
+    uint public softCap;
     uint public amountRaised;
     uint public deadline;
     uint public price;
     token public tokenReward;
     mapping(address => uint256) public balanceOf;
+    bool softCapReached = false;
     bool fundingGoalReached = false;
     bool presaleClosed = false;
 
     event GoalReached(address recipient, uint totalAmountRaised);
+    event SoftCapReached(uint softCap);
     event FundTransfer(address backer, uint amount, bool isContribution);
 
     /**
@@ -26,14 +29,14 @@ contract Presale {
      */
     function Presale(
         address ifSuccessfulSendTo,
-        uint fundingGoalInEthers,
         uint durationInMinutes,
         address addressOfTokenUsedAsReward
     ) {
         beneficiary = ifSuccessfulSendTo;
-        fundingGoal = fundingGoalInEthers * 1 ether;
+        fundingGoal = 400 * 1 ether;
+        softCap = 0.1 * 1 ether;
         deadline = now + durationInMinutes * 1 minutes;
-        price = 10;
+        price = 10;//each ETH = 10 * XSH.
         tokenReward = token(addressOfTokenUsedAsReward);
     }
 
@@ -44,6 +47,14 @@ contract Presale {
      */
     function () payable {
         require(!presaleClosed);
+        require(msg.value >= 0.01 * 1 ether);
+        require(amountRaised + msg.value <= hardCap);
+
+        if (!softCapReached && amountRaised < softCap && amountRaised + msg.value >= softCap) {
+            softCapReached = true;
+            SoftCapReached(softCap);
+        }
+
         uint amount = msg.value;
         balanceOf[msg.sender] += amount;
         amountRaised += amount;
@@ -75,7 +86,7 @@ contract Presale {
      * the amount they contributed.
      */
     function safeWithdrawal() afterDeadline {
-        if (!fundingGoalReached && beneficiary != msg.sender) {
+        if (!softCapReached) {
             uint remainingCoins = (fundingGoal - amountRaised) * price;
             
             uint amount = balanceOf[msg.sender];
@@ -89,8 +100,7 @@ contract Presale {
             }
         }
 
-        //if (fundingGoalReached && beneficiary == msg.sender) {
-        if (beneficiary == msg.sender) {
+        if (softCapReached && beneficiary == msg.sender) {
             if (beneficiary.send(amountRaised)) {
                 FundTransfer(beneficiary, amountRaised, false);
             } else {
