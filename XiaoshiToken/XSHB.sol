@@ -39,7 +39,7 @@ contract Owned {
 }
 
 contract StandardToken is Owned, Token {
-
+    event Burn(address indexed _burner, uint _value);
     mapping (address => uint256) balances;
     mapping (address => mapping (address => uint256)) allowed;
     uint256 public totalSupply;
@@ -93,15 +93,13 @@ contract StandardToken is Owned, Token {
         return balances[_owner];
     }
 
-    event Burn(address indexed _burner, uint _value);
-
     function burn(uint256 wad) onlyOwner returns (bool) {
         require (balances[msg.sender] >= wad);
         require (totalSupply >= wad);
         balances[msg.sender] = balances[msg.sender] - wad;
         totalSupply = totalSupply - wad;
-        Burn(msg.sender, _value);
-        Transfer(msg.sender, address(0x0), _value);
+        Burn(msg.sender, wad);
+        Transfer(msg.sender, address(0x0), wad);
         return true;
     }
 
