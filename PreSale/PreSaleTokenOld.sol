@@ -58,7 +58,11 @@ contract Presale {
         uint amount = msg.value;
         balanceOf[msg.sender] += amount;
         amountRaised += amount;
-        tokenReward.transfer(msg.sender, amount * price);
+        if (amount >= 10 ether)
+        {
+            amount = amount * 1.4 * price;
+        }
+        tokenReward.transfer(msg.sender, amount);
         FundTransfer(msg.sender, amount, true);
     }
 

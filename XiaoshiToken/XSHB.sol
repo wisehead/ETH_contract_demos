@@ -123,7 +123,7 @@ contract XiaoshiTokenB is StandardToken {
     function XiaoshiTokenB()
         public
     {
-        totalSupply = 200 * 1000000 * 10**18; // will not change
+        totalSupply = 10 * 100000000 * 10**18; // will not change
         balances[msg.sender] = totalSupply;
     }
 }
