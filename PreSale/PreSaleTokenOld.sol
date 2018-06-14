@@ -33,10 +33,10 @@ contract Presale {
         address addressOfTokenUsedAsReward
     ) {
         beneficiary = ifSuccessfulSendTo;
-        fundingGoal = 3333 * 1 ether;
-        softCap = 0.1 * 1 ether;
+        fundingGoal = 3360 * 1 ether;
+        softCap = 336 * 1 ether;
         deadline = now + durationInMinutes * 1 minutes;
-        price = 3000;//each ETH = 3000 * XSHB.
+        price = 2500;//each ETH = 3000 * XSHB.
         tokenReward = token(addressOfTokenUsedAsReward);
     }
 
@@ -47,18 +47,21 @@ contract Presale {
      */
     function () payable {
         require(!presaleClosed);
-        require(msg.value >= 0.01 * 1 ether);
+        require(msg.value >= 5 * 1 ether);
         require(amountRaised + msg.value <= fundingGoal);
-
-        if (!softCapReached && amountRaised < softCap && amountRaised + msg.value >= softCap) {
-            softCapReached = true;
-            SoftCapReached(softCap);
-        }
 
         uint amount = msg.value;
         balanceOf[msg.sender] += amount;
         amountRaised += amount;
         FundTransfer(msg.sender, amount, true);
+    }
+    
+    function balanceOf(address _owner)
+        constant
+        public
+        returns (uint256)
+    {
+        return balanceOf[_owner];
     }
 
     modifier afterDeadline() { if (now >= deadline) _; }
@@ -76,6 +79,13 @@ contract Presale {
         presaleClosed = true;
     }
 
+    function checkSoftCapReached() {
+        if (!softCapReached && amountRaised >= softCap) {
+            softCapReached = true;
+            SoftCapReached(softCap);
+        }
+    }
+    
 
     /**
      * Withdraw the funds
